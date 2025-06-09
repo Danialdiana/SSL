@@ -36,8 +36,13 @@ class _CameraPageState extends State<CameraPage> {
   void initState() {
     super.initState();
     _receivePort = ReceivePort();
-    _initializeApp();
-    _initIsolate();
+     _start();
+  }
+
+  Future<void> _start() async {
+    // Ensure model and labels are loaded before starting the isolate
+    await _initializeApp();
+    await _initIsolate();
   }
 
   Future<void> _initializeApp() async {
@@ -83,22 +88,56 @@ static void _modelRunner(SendPort sendPort) async {
         else if (message[0] == 'process') {
           try {
             final planeY = message[1] as Uint8List;
-            final width = message[2] as int;
-            final height = message[3] as int;
-            
-            // Создаем Float32List напрямую
-            final input = Float32List(width * height * 3);
-            for (int i = 0; i < planeY.length; i++) {
-              final val = planeY[i] / 255.0;
-              input[i*3] = val;     // R
-              input[i*3+1] = val;   // G
-              input[i*3+2] = val;   // B
+            final planeU = message[2] as Uint8List;
+            final planeV = message[3] as Uint8List;
+            final width = message[4] as int;
+            final height = message[5] as int;
+            final uvRowStride = message[6] as int;
+            final uvPixelStride = message[7] as int;
+
+            // Получаем форму входного тензора модели
+            final inputShape = isolateInterpreter!.getInputTensor(0).shape;
+            final expectedLength = inputShape.reduce((a, b) => a * b);
+
+            // Конвертируем YUV420 в RGB изображение
+            final img.Image imgImage = img.Image(width: width, height: height);
+            int pixelIndex = 0;
+            for (int h = 0; h < height; h++) {
+              for (int w = 0; w < width; w++) {
+                final uvIndex = uvPixelStride * (w ~/ 2) + uvRowStride * (h ~/ 2);
+                final yp = planeY[pixelIndex];
+                final up = planeU[uvIndex];
+                final vp = planeV[uvIndex];
+
+                final r = (yp + 1.370705 * (vp - 128)).clamp(0, 255).toInt();
+                final g = (yp - 0.337633 * (up - 128) - 0.698001 * (vp - 128))
+                    .clamp(0, 255)
+                    .toInt();
+                final b = (yp + 1.732446 * (up - 128)).clamp(0, 255).toInt();
+
+                imgImage.setPixelRgb(w, h, r, g, b);
+                pixelIndex++;
+              }
+            }
+
+            // Масштабируем под размер входа модели
+            final resized = img.copyResize(
+              imgImage,
+              width: inputShape.length > 2 ? inputShape[1] : width,
+              height: inputShape.length > 2 ? inputShape[2] : height,
+            );
+
+            // Преобразуем изображение в Float32List
+            final bytes = resized.getBytes();
+            final input = Float32List(expectedLength);
+            for (int j = 0; j < expectedLength && j < bytes.length; j++) {
+              input[j] = bytes[j] / 255.0;
             }
 
             // Получаем реальную форму из модели
-            final inputShape = isolateInterpreter!.getInputTensor(0).shape;
             final outputShape = isolateInterpreter.getOutputTensor(0).shape;
-            
+
+         
             // Подготавливаем выходной буфер
             final output = Float32List(outputShape.reduce((a, b) => a * b));
             
@@ -208,11 +247,17 @@ Future<void> _initCamera() async {
       _isolateRunning = true;
       // Передаем только Y-плоскость для экономии памяти
       final planeY = Uint8List.fromList(image.planes[0].bytes);
+      final planeU = Uint8List.fromList(image.planes[1].bytes);
+      final planeV = Uint8List.fromList(image.planes[2].bytes);
       _isolateSendPort?.send([
         'process',
         planeY,
+        planeU,
+        planeV,
         image.width,
-        image.height
+        image.height,
+        image.planes[1].bytesPerRow,
+        image.planes[1].bytesPerPixel ?? 1,
       ]);
     });
   } catch (e) {
