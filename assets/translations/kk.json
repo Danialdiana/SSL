@@ -1,0 +1,19 @@
+{
+  "app_title": "QolDan",
+  "settings": "Баптаулар",
+  "dark_mode": "Қараңғы режим",
+  "search_letter": "Әріп іздеу",
+  "words_with_letter": "Әріптен басталатын сөздер - ",
+  "translate": "Аудару",
+  "enter_words": "Сөздерді енгізіңіз",
+  "show_gestures": "Ымдарды көрсету",
+  "dictionary": "Сөздік",
+  "camera": "Камера",
+  "language": "Тіл",
+  "theme": "Тақырып",
+  "light": "Ашық",
+  "dark": "Қараңғы",
+  "system": "Жүйелік",
+  "font_size": "Қаріп өлшемі",
+  "learn": "Үйрену"
+}

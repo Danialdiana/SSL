@@ -1,0 +1,45 @@
+name: test_sign_lang
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  video_player: ^2.5.0
+  postgres: ^3.5.5
+  cupertino_icons: ^1.0.8
+  flutter_inappwebview: ^6.0.0
+  firebase_core: 3.13.0
+  cloud_firestore: ^5.4.0
+  youtube_player_flutter: 9.1.1
+  path_provider: ^2.1.1
+  image: ^4.5.3
+  easy_localization: ^3.0.1
+  provider: ^6.0.5
+  ffi: ^2.1.0
+  camera: ^0.10.5+9
+  tflite_flutter:
+    path: ./local_packages/tflite_flutter
+
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+     -  assets/videos/
+     -  assets/models/models_our.tflite
+     -  assets/models/labels.txt
+     -  assets/alphabet/
+     -  assets/default.jpg
+     -  assets/translations/

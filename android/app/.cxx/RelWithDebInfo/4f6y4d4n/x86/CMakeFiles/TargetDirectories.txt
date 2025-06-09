@@ -1,0 +1,2 @@
+C:/Tools/My_application/test_sign_lang/android/app/.cxx/RelWithDebInfo/4f6y4d4n/x86/CMakeFiles/edit_cache.dir
+C:/Tools/My_application/test_sign_lang/android/app/.cxx/RelWithDebInfo/4f6y4d4n/x86/CMakeFiles/rebuild_cache.dir

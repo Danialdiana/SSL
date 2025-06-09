@@ -1,0 +1,1 @@
+C:\Tools\My_application\test_sign_lang\build\app\intermediates\cxx\RelWithDebInfo\4f6y4d4n\obj\armeabi-v7a

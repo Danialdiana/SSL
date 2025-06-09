@@ -1,0 +1,2 @@
+C:/Tools/My_application/test_sign_lang/android/app/.cxx/Debug/3s6984z3/x86_64/CMakeFiles/edit_cache.dir
+C:/Tools/My_application/test_sign_lang/android/app/.cxx/Debug/3s6984z3/x86_64/CMakeFiles/rebuild_cache.dir
